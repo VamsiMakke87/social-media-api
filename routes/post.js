@@ -80,7 +80,7 @@ router.put("/like/:id", async( req,res)=>{
 
 
 //fetch timeline posts
-router.get("/timeline/all", async(req,res)=>{
+router.get("/feed/all", async(req,res)=>{
 
     try{
 
@@ -99,7 +99,7 @@ router.get("/timeline/all", async(req,res)=>{
 });
 
 //timeline of specific user
-router.get("/timeline/:id", async(req,res)=>{
+router.get("/feed/:id", async(req,res)=>{
 
     try{
 
