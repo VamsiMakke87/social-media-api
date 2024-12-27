@@ -59,6 +59,6 @@ A RESTful API for a social media platform that allows users to create posts, com
 - **GET /api/comment/all** - Get all comments of the post
 - **POST /api/comment/reply** - Create a new reply
 - **PUT /api/comment/reply/:id** - Update an existing reply
- **PUT /api/comment/reply/like/:id** - Like and unlike a reply
+- **PUT /api/comment/reply/like/:id** - Like and unlike a reply
 - **DELETE /api/comment/reply/:id** - Delete a reply
 - **GET /api/comment/reply/all** - Get all replies of the comment
