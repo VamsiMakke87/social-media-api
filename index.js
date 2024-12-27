@@ -6,6 +6,8 @@ const helmet= require('helmet');
 const userRoute= require("./routes/users");
 const authRoute=require('./routes/auth');
 const postRoute=require('./routes/post');
+const commentRoute=require('./routes/comment');
+const replyRouter= require('./routes/replies');
 
 const app=express();
 dotenv.config();
@@ -30,6 +32,8 @@ app.use(morgan("common"));
 app.use("/api/users",userRoute);
 app.use('/api/auth',authRoute);
 app.use('/api/posts',postRoute);
+app.use('/api/comment',commentRoute);
+app.use('/api/comment/reply',replyRouter);
 
 
 app.listen(8800,()=>{

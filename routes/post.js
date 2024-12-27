@@ -79,7 +79,7 @@ router.put("/like/:id", async( req,res)=>{
 });
 
 
-//fetch timeline posts
+// Fetch timeline posts
 router.get("/feed/all", async(req,res)=>{
 
     try{
@@ -114,6 +114,8 @@ router.get("/feed/:id", async(req,res)=>{
     }
 
 });
+
+
 
 
 
