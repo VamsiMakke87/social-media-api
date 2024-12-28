@@ -10,7 +10,7 @@ A RESTful API for a social media platform that allows users to create posts, com
 - Node.js
 - Express.js
 - MongoDB
-- JWT Authentication
+
 
 ## Features
 
