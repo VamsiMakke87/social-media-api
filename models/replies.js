@@ -5,9 +5,13 @@ const replySchema = mongoose.Schema(
     userId: {
       type: String,
       max: 50,
+      required: true
+    },
+    userName:{
+      type: String,
     },
     profileImage:{
-      type: String
+      type: String,
     },
     description: {
       type: String,

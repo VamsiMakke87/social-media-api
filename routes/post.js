@@ -89,7 +89,7 @@ router.get("/feed/all", async(req,res)=>{
         const friendPosts= await Promise.all(currUser.following.map((friendId)=>{
             return Post.find({userId:friendId});
         }));
-        currUserPost.push(...friendPosts[1]);
+        currUserPost.push(...friendPosts[0]);
         return res.status(200).json(currUserPost);
     }catch(err){
         console.log(err);

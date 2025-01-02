@@ -5,13 +5,19 @@ const postSchema = mongoose.Schema(
     userId: {
       type: String,
       max: 50,
+      required: true,
     },
-    profileImage:{
-      type: String
+    userName: {
+      type: String,
+    },
+    profileImage: {
+      type: String,
+      required: true,
     },
     description: {
       type: String,
       max: 50,
+      required: true,
     },
     image: {
       type: String,
@@ -20,10 +26,10 @@ const postSchema = mongoose.Schema(
       type: Array,
       default: [],
     },
-    comments:{
+    comments: {
       type: Array,
-      default: []
-    }
+      default: [],
+    },
   },
   { timestamps: true }
 );
