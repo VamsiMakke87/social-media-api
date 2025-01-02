@@ -6,6 +6,9 @@ const postSchema = mongoose.Schema(
       type: String,
       max: 50,
     },
+    profileImage:{
+      type: String
+    },
     description: {
       type: String,
       max: 50,

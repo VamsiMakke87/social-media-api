@@ -6,6 +6,9 @@ const commentSchema = mongoose.Schema(
       type: String,
       max: 50,
     },
+    profileImage:{
+      type: String
+    },
     description: {
       type: String,
       required:true,
