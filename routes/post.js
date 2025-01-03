@@ -73,11 +73,20 @@ router.get("/feed/all/:id", async (req, res) => {
       })
     );
     // console.log(friendPosts[0]);
-
-    console.log(friendPosts);
     for (const post of friendPosts) currUserPost.push(...post);
     currUserPost.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-    return res.status(200).json(currUserPost);
+
+    const updatedCurrUserPost = await Promise.all(
+      currUserPost.map(async (postData) => {
+        const ps = postData.toObject();
+        const postUser = await User.findById(ps.userId);
+        ps.username = postUser.username;
+        ps.profilePic = postUser.profilePic;
+        return ps;
+      })
+    );
+
+    return res.status(200).json(updatedCurrUserPost);
   } catch (err) {
     console.log(err);
     res.status(500).json(err);
@@ -90,9 +99,17 @@ router.get("/feed/:id", async (req, res) => {
     // const currUser= await User.findById(req.body.userId);
     // const currUserPost=await Post.find({userId: req.body.userId});
     // console.log(params)
+    const user = await User.findById(req.params.id);
     const friendPosts = await Post.find({ userId: req.params.id });
 
-    return res.status(200).json(friendPosts);
+    const updatedFriendPosts=friendPosts.map((post) => {
+      const ps = post.toObject();
+      ps.username = user.username;
+      ps.profilePic=user.profilePic;
+      return ps;
+    });
+
+    return res.status(200).json(updatedFriendPosts);
   } catch (err) {
     console.log(err);
     res.status(500).json(err);
