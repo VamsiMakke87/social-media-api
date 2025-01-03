@@ -74,11 +74,20 @@ router.put("/like/:id", async (req, res) => {
 });
 
 // Fetch comment replies
-router.get("/all", async (req, res) => {
+router.get("/all/:id", async (req, res) => {
   try {
-    const replies = await Reply.find({ commentId: req.body.commentId });
+    const replies = await Reply.find({ commentId: req.params.id });
     replies.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-    return res.status(200).json(replies);
+    console.log(replies);
+    const updatedReplies = await Promise.all(replies.map(async (reply) => {
+      const replyData= reply.toObject();
+      const user=await  User.findById(replyData.userId);
+      replyData.username=user.username;
+      replyData.profilePic=user.profilePic;
+      return replyData;
+    }));
+
+    return res.status(200).json(updatedReplies);
   } catch (err) {
     res.status(500).json(err);
   }
