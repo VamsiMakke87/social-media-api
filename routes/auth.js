@@ -2,6 +2,7 @@ const router = require("express").Router();
 const User = require("../models/user");
 const bcrypt = require("bcrypt");
 
+
 router.get("/", (req, res) => {
   res.send("Auth Route");
 });

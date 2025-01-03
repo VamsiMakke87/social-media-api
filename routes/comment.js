@@ -97,7 +97,7 @@ router.get("/all", async(req,res)=>{
     try{
 
         const comments= await Comment.find({postId: req.body.postId});
-    
+        comments.sort((a,b)=> new Date(b.createdAt)-new Date(a.createdAt));
         return res.status(200).json(comments);
     }catch(err){
         res.status(500).json(err);

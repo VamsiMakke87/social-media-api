@@ -8,6 +8,7 @@ const authRoute=require('./routes/auth');
 const postRoute=require('./routes/post');
 const commentRoute=require('./routes/comment');
 const replyRouter= require('./routes/replies');
+const cors=require("cors");
 
 const app=express();
 dotenv.config();
@@ -26,6 +27,10 @@ const connectDB = (async () => {
 })();
 // connectDB();
 
+app.use(cors({
+    origin: 'http://localhost:3000',
+  }));
+  
 app.use(express.json());
 app.use(helmet());
 app.use(morgan("common"));
