@@ -7,12 +7,6 @@ const commentSchema = mongoose.Schema(
       max: 50,
       required: true
     },
-    userName:{
-      type: String,
-    },
-    profileImage:{
-      type: String,
-    },
     description: {
       type: String,
       required:true,
