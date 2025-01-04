@@ -88,7 +88,7 @@ router.get("/feed/all/:id", async (req, res) => {
 
     return res.status(200).json(updatedCurrUserPost);
   } catch (err) {
-    console.log(err);
+    // console.log(err);
     res.status(500).json(err);
   }
 });
@@ -111,7 +111,7 @@ router.get("/feed/:id", async (req, res) => {
 
     return res.status(200).json(updatedFriendPosts);
   } catch (err) {
-    console.log(err);
+    // console.log(err);
     res.status(500).json(err);
   }
 });

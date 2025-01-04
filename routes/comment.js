@@ -11,12 +11,12 @@ router.post("/", async (req, res) => {
   try {
     const post = await Post.findById(req.body.postId);
     const data = await newComment.save();
-    console.log(data);
+    // console.log(data);
     await post.updateOne({ $push: { comments: data._doc._id } });
 
     res.status(200).json(data);
   } catch (err) {
-    console.log(err);
+    // console.log(err);
     res.status(500).json(err);
   }
 });
@@ -62,7 +62,9 @@ router.put("/like/:id", async (req, res) => {
     // console.log(typeof(post.likes)+";"+post.userId);
 
     if (!comment.likes.includes(req.body.userId)) {
-      await comment.updateOne({ $push: { likes: req.body.userId } });
+      const data = await comment.updateOne({
+        $push: { likes: req.body.userId },
+      });
       res.status(200).json("Liked Sucessfully");
     } else {
       await comment.updateOne({ $pull: { likes: req.body.userId } });

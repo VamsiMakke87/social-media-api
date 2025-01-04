@@ -12,12 +12,11 @@ router.post("/", async (req, res) => {
     // console.log(req.params.cmntId);
     const comment = await Comment.findById(req.body.commentId);
     const data = await newReply.save();
-    console.log(data);
     await comment.updateOne({ $push: { replies: data._doc._id } });
 
     res.status(200).json(data);
   } catch (err) {
-    console.log(err);
+    // console.log(err);
     res.status(500).json(err);
   }
 });
@@ -78,7 +77,6 @@ router.get("/all/:id", async (req, res) => {
   try {
     const replies = await Reply.find({ commentId: req.params.id });
     replies.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-    console.log(replies);
     const updatedReplies = await Promise.all(replies.map(async (reply) => {
       const replyData= reply.toObject();
       const user=await  User.findById(replyData.userId);

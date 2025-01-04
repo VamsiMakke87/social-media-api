@@ -76,7 +76,7 @@ router.put("/follow/:id", async (req, res) => {
       res.status(403).json("You cannot follow yourself");
     }
   } catch (err) {
-    console.log(err);
+    // console.log(err);
     res.status(500).json(err);
   }
 });
@@ -101,7 +101,7 @@ router.put("/unfollow/:id", async (req, res) => {
         res.status(403).json("You cannot unfollow yourself");
       }
   }catch(err){
-    console.log(err);
+    // console.log(err);
       res.status(500).json(err)
   }
 });
