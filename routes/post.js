@@ -101,7 +101,7 @@ router.get("/feed/:id", async (req, res) => {
     // console.log(params)
     const user = await User.findById(req.params.id);
     const friendPosts = await Post.find({ userId: req.params.id });
-
+    friendPosts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     const updatedFriendPosts=friendPosts.map((post) => {
       const ps = post.toObject();
       ps.username = user.username;
