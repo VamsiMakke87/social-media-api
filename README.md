@@ -11,7 +11,7 @@ A RESTful API for a social media platform that allows users to create posts, com
 - Express.js
 - MongoDB
  
-
+[Link to frontend code](https://github.com/VamsiMakke87/social-media-app)
 
 ## Features
 
