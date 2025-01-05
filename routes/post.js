@@ -1,10 +1,45 @@
 const router = require("express").Router();
 const Post = require("../models/post");
 const User = require("../models/user");
+const path = require("path");
+const multer = require("multer");
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "/react/social-media-api/uploads");
+  },
+  filename: (req, file, cb) => {
+    const name = `${Date.now()}-${file.originalname}`;
+    cb(null,name);
+  },
+});
+
+const upload= multer({
+  storage,
+  limits:{fileSize: 2*1024*1024},
+  fileFilter: (req,file,cb)=>{
+    const fileType=/jpg|jpeg|png/;
+    const extension=fileType.test(path.extname(file.originalname).toLowerCase());
+    const mime= fileType.test(file.mimetype);
+    if(extension && mime){
+      cb(null,true);
+    }else{
+      cb(new Error('Only .jpg, .jpeg, .png file upto 2MB are accepted.'));
+    }
+  }
+});
 
 // Create a post
-router.post("/", async (req, res) => {
-  const newPost = new Post(req.body);
+router.post("/", upload.single('file'),async (req, res) => {
+
+  const data= JSON.parse(JSON.stringify(req.body));
+  delete data.file;
+  if(req.file){
+    const imagePath= path.join(__dirname,'../uploads',req.file.filename);
+    data.image= imagePath;
+  }
+
+  const newPost = new Post(data);
 
   try {
     const post = await newPost.save();
@@ -102,10 +137,10 @@ router.get("/feed/:id", async (req, res) => {
     const user = await User.findById(req.params.id);
     const friendPosts = await Post.find({ userId: req.params.id });
     friendPosts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-    const updatedFriendPosts=friendPosts.map((post) => {
+    const updatedFriendPosts = friendPosts.map((post) => {
       const ps = post.toObject();
       ps.username = user.username;
-      ps.profilePic=user.profilePic;
+      ps.profilePic = user.profilePic;
       return ps;
     });
 
@@ -115,5 +150,23 @@ router.get("/feed/:id", async (req, res) => {
     res.status(500).json(err);
   }
 });
+
+
+router.post("/upload",upload.single('file'),(req,res)=>{
+
+  try{
+    if(!req.file){
+      res.status(403).json('No file uploaded');
+    }
+
+    const filePath= path.join(__dirname,'../uploads',req.file.filename);
+
+    res.status(200).json(filePath);
+
+  }catch(err){
+    res.status(500).json('Upload Failed');
+  }
+
+})
 
 module.exports = router;

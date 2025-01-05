@@ -1,6 +1,36 @@
 const router = require("express").Router();
 const bcrypt = require("bcrypt");
 const User = require("../models/user");
+const path = require("path");
+const multer = require("multer");
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "/react/social-media-api/uploads/");
+  },
+  filename: (req, file, cb) => {
+    const name = `${Date.now()}-${file.originalname}`;
+    cb(null, name);
+  },
+});
+
+const upload = multer({
+  storage,
+  limits: { fieldSize: 2 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    const fileType = /jpg|jpeg|png/;
+    const extension = fileType.test(
+      path.extname(file.originalname).toLowerCase()
+    );
+    const mimeType = fileType.test(file.mimetype);
+
+    if (extension && mimeType) {
+      cb(null, true);
+    } else {
+      cb(new Error("Only.jpeg, .jpg and .png of max 2MB are allowed"));
+    }
+  },
+});
 
 router.get("/", (req, res) => {
   res.send("User Route");
@@ -124,6 +154,20 @@ router.put("/unfollow/:id", async (req, res) => {
   } catch (err) {
     // console.log(err);
     res.status(500).json(err);
+  }
+});
+
+router.post("/upload", upload.single("file"), (req, res) => {
+  try {
+    if (!req.file) {
+      res.status(403).json("No file uploaded");
+    }
+
+    const filePath = path.join(__dirname, "../uploads", req.file.filename);
+
+    res.status(200).json(filePath);
+  } catch (err) {
+    return res.status(500).json(err.message);
   }
 });
 
