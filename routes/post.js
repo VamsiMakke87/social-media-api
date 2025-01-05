@@ -6,7 +6,7 @@ const multer = require("multer");
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "/react/social-media-api/uploads");
+    cb(null, "/react/social-media-app/social-media-frontend/public/images/posts");
   },
   filename: (req, file, cb) => {
     const name = `${Date.now()}-${file.originalname}`;
@@ -16,7 +16,7 @@ const storage = multer.diskStorage({
 
 const upload= multer({
   storage,
-  limits:{fileSize: 2*1024*1024},
+  limits:{fileSize: 10*1024*1024},
   fileFilter: (req,file,cb)=>{
     const fileType=/jpg|jpeg|png/;
     const extension=fileType.test(path.extname(file.originalname).toLowerCase());
@@ -32,19 +32,20 @@ const upload= multer({
 // Create a post
 router.post("/", upload.single('file'),async (req, res) => {
 
-  const data= JSON.parse(JSON.stringify(req.body));
-  delete data.file;
+  const {userId,description}= req.body;
+  const data={userId,description};
   if(req.file){
-    const imagePath= path.join(__dirname,'../uploads',req.file.filename);
+    const imagePath= path.join('./images/posts',req.file.filename);
     data.image= imagePath;
   }
-
+  console.log(req.body);
   const newPost = new Post(data);
 
   try {
     const post = await newPost.save();
     res.status(200).json("Posted Sucessfully");
   } catch (err) {
+    console.log(err);
     res.status(500).json(err);
   }
 });
@@ -159,7 +160,7 @@ router.post("/upload",upload.single('file'),(req,res)=>{
       res.status(403).json('No file uploaded');
     }
 
-    const filePath= path.join(__dirname,'../uploads',req.file.filename);
+    const filePath= path.join('./uploads/posts',req.file.filename);
 
     res.status(200).json(filePath);
 
