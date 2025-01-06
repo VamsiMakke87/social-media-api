@@ -36,6 +36,24 @@ router.get("/", (req, res) => {
   res.send("User Route");
 });
 
+//update profile pic
+router.put("/profilepic", upload.single("file"), async (req, res) => {
+  try {
+    if (!req.file) {
+      res.status(403).json("No file uploaded");
+    }
+
+    const filePath = path.join("./images/users", req.file.filename);
+
+    const user = await User.findByIdAndUpdate(req.body.userId, {
+      $set: { profilePic: filePath },
+    });
+    res.status(200).json("Profile updated Successfully");
+  } catch (err) {
+    return res.status(500).json(err.message);
+  }
+});
+
 // Update User profile
 router.put("/:id", async (req, res) => {
   if (req.body.userId === req.params.id || req.body.isAdmin) {
@@ -154,20 +172,6 @@ router.put("/unfollow/:id", async (req, res) => {
   } catch (err) {
     // console.log(err);
     res.status(500).json(err);
-  }
-});
-
-router.post("/upload", upload.single("file"), (req, res) => {
-  try {
-    if (!req.file) {
-      res.status(403).json("No file uploaded");
-    }
-
-    const filePath = path.join("./images/users", req.file.filename);
-
-    res.status(200).json(filePath);
-  } catch (err) {
-    return res.status(500).json(err.message);
   }
 });
 
