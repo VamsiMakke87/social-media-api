@@ -46,7 +46,7 @@ router.put("/profilepic", upload.single("file"), async (req, res) => {
     const filePath = path.join("./images/users", req.file.filename);
 
     const user = await User.findByIdAndUpdate(req.body.userId, {
-      $set: { profilePic: filePath },
+      $set: { profilePic: '/'+filePath },
     });
     res.status(200).json("Profile updated Successfully");
   } catch (err) {

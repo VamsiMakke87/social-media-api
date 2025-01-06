@@ -36,7 +36,7 @@ router.post("/", upload.single('file'),async (req, res) => {
   const data={userId,description};
   if(req.file){
     const imagePath= path.join('./images/posts',req.file.filename);
-    data.image= imagePath;
+    data.image= '/'+imagePath;
   }
   console.log(req.body);
   const newPost = new Post(data);
