@@ -6,7 +6,7 @@ const multer = require("multer");
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "/react/social-media-app/social-media-frontend/public/images/posts");
+    cb(null, `${process.env.FILE_UPLOAD}/posts`);
   },
   filename: (req, file, cb) => {
     const name = `${Date.now()}-${file.originalname}`;
@@ -160,7 +160,7 @@ router.post("/upload",upload.single('file'),(req,res)=>{
       res.status(403).json('No file uploaded');
     }
 
-    const filePath= path.join('./uploads/posts',req.file.filename);
+    const filePath= path.join('./images/posts',req.file.filename);
 
     res.status(200).json(filePath);
 
