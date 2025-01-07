@@ -9,9 +9,19 @@ const postRoute=require('./routes/post');
 const commentRoute=require('./routes/comment');
 const replyRouter= require('./routes/replies');
 const cors=require("cors");
+const {Server} = require('socket.io');
+const http= require('http');
+const authenticateJWT = require('./middleware/authMiddleware');
 
 const app=express();
 dotenv.config();
+const server= http.createServer(app);
+const io= new Server(server,{
+    cors:{
+        origin: 'http://localhost:3000',
+        methods: ['GET','POST','PUT','DELETE']
+    }
+});
 
 const connectDB = (async () => {
     try {
@@ -28,20 +38,33 @@ const connectDB = (async () => {
 // connectDB();
 
 app.use(cors({
-    origin: 'http://localhost:3000',
+    origin: process.env.SOCKET_URL,
   }));
   
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(helmet());
 app.use(morgan("common"));
-app.use("/api/users",userRoute);
 app.use('/api/auth',authRoute);
+app.use("/api/users",userRoute);
 app.use('/api/posts',postRoute);
 app.use('/api/comment',commentRoute);
 app.use('/api/comment/reply',replyRouter);
 
+io.on('connection',(socket)=>{
+    console.log('Connected: ',socket.id);
 
-app.listen(8800,()=>{
+    socket.on('send_msg',(data)=>{
+        console.log('Message received:', data);
+        socket.broadcast.emit("recieve_msg", `Server says: ${data}`);
+    });
+    socket.on("disconnect", () => {
+        console.log("A user disconnected:", socket.id);
+      });
+});
+
+
+
+server.listen(8800,()=>{
     console.log("Server started");
 });
