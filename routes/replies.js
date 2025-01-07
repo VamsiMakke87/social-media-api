@@ -3,6 +3,7 @@ const Post = require("../models/post");
 const User = require("../models/user");
 const Comment = require("../models/comment");
 const Reply = require("../models/replies");
+const Notification = require("../models/replies");
 
 // Add a reply
 router.post("/", async (req, res) => {

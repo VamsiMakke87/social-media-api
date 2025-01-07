@@ -7,7 +7,7 @@ const userRoute= require("./routes/users");
 const authRoute=require('./routes/auth');
 const postRoute=require('./routes/post');
 const commentRoute=require('./routes/comment');
-const replyRouter= require('./routes/replies');
+const replyRoute= require('./routes/replies');
 const cors=require("cors");
 const {Server} = require('socket.io');
 const http= require('http');
@@ -49,7 +49,7 @@ app.use('/api/auth',authRoute);
 app.use("/api/users",authenticateJWT,userRoute);
 app.use('/api/posts',authenticateJWT,postRoute);
 app.use('/api/comment',authenticateJWT,commentRoute);
-app.use('/api/comment/reply',authenticateJWT,replyRouter);
+app.use('/api/comment/reply',authenticateJWT,replyRoute);
 
 io.on('connection',(socket)=>{
     console.log('Connected: ',socket.id);

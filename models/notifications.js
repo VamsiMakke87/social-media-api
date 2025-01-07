@@ -12,9 +12,21 @@ const notificationsSchema = mongoose.Schema(
       max: 50,
       required: true,
     },
-    notificationType: {
-      type: Number,
-      required: true
+    postId: {
+      type: String,
+      max: 50,
+    },
+    commentId: {
+      type: String,
+      max: 50,
+    },
+    replyId: {
+      type: String,
+      max: 50,
+    },
+    description: {
+      type: String,
+      max: 50,
     },
   },
   { timestamps: true }

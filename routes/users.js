@@ -1,7 +1,9 @@
 const router = require("express").Router();
 const bcrypt = require("bcrypt");
 const User = require("../models/user");
+const Notifications = require("../models/notifications");
 const path = require("path");
+const jwt = require("jsonwebtoken");
 const multer = require("multer");
 
 const storage = multer.diskStorage({
@@ -46,7 +48,7 @@ router.put("/profilepic", upload.single("file"), async (req, res) => {
     const filePath = path.join("./images/users", req.file.filename);
 
     const user = await User.findByIdAndUpdate(req.body.userId, {
-      $set: { profilePic: '/'+filePath },
+      $set: { profilePic: "/" + filePath },
     });
     res.status(200).json("Profile updated Successfully");
   } catch (err) {
@@ -131,14 +133,23 @@ router.get("/:id", async (req, res) => {
 //follow a user
 router.put("/follow/:id", async (req, res) => {
   try {
-    if (req.body.userId != req.params.id) {
+    const token = req.header("Authorization").substring(7);
+    const payload = jwt.decode(token);
+    if (payload.id != req.params.id) {
       const currUser = await User.findById(req.body.userId);
-
+      const notificationData = {
+        fromUserId: req.body.userId,
+        toUserId: req.params.id,
+        description: "followed you",
+      };
+      const newNotification = new Notifications(notificationData);
       const user = await User.findById(req.params.id);
 
       if (!user.followers.includes(req.body.userId)) {
         await user.updateOne({ $push: { followers: req.body.userId } });
         await currUser.updateOne({ $push: { following: req.params.id } });
+        await newNotification.save();
+
         res.status(200).json("Follow Sucessfull");
       } else {
         res.status(403).json("You already follow this account");
@@ -171,6 +182,28 @@ router.put("/unfollow/:id", async (req, res) => {
     }
   } catch (err) {
     // console.log(err);
+    res.status(500).json(err);
+  }
+});
+
+//get user notifications
+router.get("/notifications/:id", async (req, res) => {
+  try {
+    const token = req.header("Authorization").substring(7);
+    const payload = jwt.decode(token);
+
+    if (payload.id === req.params.id) {
+      const notifications = await Notifications.find({
+        toUserId: req.params.id,
+      });
+      notifications.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+      res.status(200).json(notifications);
+    } else {
+      res.status(403).json({ message: "You can only view your notifications" });
+    }
+  } catch (err) {
+    console.log(err);
     res.status(500).json(err);
   }
 });

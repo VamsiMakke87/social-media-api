@@ -10,33 +10,34 @@ const storage = multer.diskStorage({
   },
   filename: (req, file, cb) => {
     const name = `${Date.now()}-${file.originalname}`;
-    cb(null,name);
+    cb(null, name);
   },
 });
 
-const upload= multer({
+const upload = multer({
   storage,
-  limits:{fileSize: 10*1024*1024},
-  fileFilter: (req,file,cb)=>{
-    const fileType=/jpg|jpeg|png/;
-    const extension=fileType.test(path.extname(file.originalname).toLowerCase());
-    const mime= fileType.test(file.mimetype);
-    if(extension && mime){
-      cb(null,true);
-    }else{
-      cb(new Error('Only .jpg, .jpeg, .png file upto 2MB are accepted.'));
+  limits: { fileSize: 10 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    const fileType = /jpg|jpeg|png/;
+    const extension = fileType.test(
+      path.extname(file.originalname).toLowerCase()
+    );
+    const mime = fileType.test(file.mimetype);
+    if (extension && mime) {
+      cb(null, true);
+    } else {
+      cb(new Error("Only .jpg, .jpeg, .png file upto 2MB are accepted."));
     }
-  }
+  },
 });
 
 // Create a post
-router.post("/", upload.single('file'),async (req, res) => {
-
-  const {userId,description}= req.body;
-  const data={userId,description};
-  if(req.file){
-    const imagePath= path.join('./images/posts',req.file.filename);
-    data.image= '/'+imagePath;
+router.post("/", upload.single("file"), async (req, res) => {
+  const { userId, description } = req.body;
+  const data = { userId, description };
+  if (req.file) {
+    const imagePath = path.join("./images/posts", req.file.filename);
+    data.image = "/" + imagePath;
   }
   console.log(req.body);
   const newPost = new Post(data);
@@ -44,6 +45,22 @@ router.post("/", upload.single('file'),async (req, res) => {
   try {
     const post = await newPost.save();
     res.status(200).json("Posted Sucessfully");
+  } catch (err) {
+    console.log(err);
+    res.status(500).json(err);
+  }
+});
+
+// get a post
+router.get("/:id", async (req, res) => {
+  try {
+    const postById = await Post.findById(req.params.id);
+    const post= postById.toObject();
+    const user = await User.findById(post.userId);
+    post.username = user.username;
+    post.profilePic = user.profilePic;
+
+    return res.status(200).json(post);
   } catch (err) {
     console.log(err);
     res.status(500).json(err);
@@ -152,22 +169,19 @@ router.get("/feed/:id", async (req, res) => {
   }
 });
 
-
-router.post("/upload",upload.single('file'),(req,res)=>{
-
-  try{
-    if(!req.file){
-      res.status(403).json('No file uploaded');
+//file test
+router.post("/upload", upload.single("file"), (req, res) => {
+  try {
+    if (!req.file) {
+      res.status(403).json("No file uploaded");
     }
 
-    const filePath= path.join('./images/posts',req.file.filename);
+    const filePath = path.join("./images/posts", req.file.filename);
 
     res.status(200).json(filePath);
-
-  }catch(err){
-    res.status(500).json('Upload Failed');
+  } catch (err) {
+    res.status(500).json("Upload Failed");
   }
-
-})
+});
 
 module.exports = router;
