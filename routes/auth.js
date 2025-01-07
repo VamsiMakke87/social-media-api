@@ -41,7 +41,7 @@ router.post("/login", async (req, res) => {
         {expiresIn: "1h"}
       );
 
-      res.status(200).json({token,"message":"Login Successfull",user});
+      res.status(200).json({token,"message":"Login Successfull","userId":user._id});
     } else {
       res.status(400).json({"message":"Invalid Password!!"});
     }

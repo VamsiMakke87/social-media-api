@@ -76,7 +76,7 @@ router.put("/like/:id", async (req, res) => {
 router.get("/all/:id", async (req, res) => {
   try {
     const replies = await Reply.find({ commentId: req.params.id });
-    replies.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    replies.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
     const updatedReplies = await Promise.all(replies.map(async (reply) => {
       const replyData= reply.toObject();
       const user=await  User.findById(replyData.userId);

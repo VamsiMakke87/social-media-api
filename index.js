@@ -46,10 +46,10 @@ app.use(express.urlencoded({ extended: true }));
 app.use(helmet());
 app.use(morgan("common"));
 app.use('/api/auth',authRoute);
-app.use("/api/users",userRoute);
-app.use('/api/posts',postRoute);
-app.use('/api/comment',commentRoute);
-app.use('/api/comment/reply',replyRouter);
+app.use("/api/users",authenticateJWT,userRoute);
+app.use('/api/posts',authenticateJWT,postRoute);
+app.use('/api/comment',authenticateJWT,commentRoute);
+app.use('/api/comment/reply',authenticateJWT,replyRouter);
 
 io.on('connection',(socket)=>{
     console.log('Connected: ',socket.id);
