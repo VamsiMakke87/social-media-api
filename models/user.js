@@ -25,9 +25,9 @@ const userSchema = mongoose.Schema(
       default:
         "https://www.shutterstock.com/image-vector/blank-avatar-photo-place-holder-600nw-1095249842.jpg",
     },
-    coverPic: {
-      type: String,
-      default: "",
+    hasUnreadNotifications: {
+      type: Boolean,
+      default: false
     },
     followers: {
       type: Array,

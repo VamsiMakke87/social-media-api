@@ -5,6 +5,7 @@ const Notifications = require("../models/notifications");
 const path = require("path");
 const jwt = require("jsonwebtoken");
 const multer = require("multer");
+const { route } = require("./auth");
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -146,7 +147,10 @@ router.put("/follow/:id", async (req, res) => {
       const user = await User.findById(req.params.id);
 
       if (!user.followers.includes(req.body.userId)) {
-        await user.updateOne({ $push: { followers: req.body.userId } });
+        await user.updateOne({
+          $push: { followers: req.body.userId },
+          $set: { hasUnreadNotifications: true },
+        });
         await currUser.updateOne({ $push: { following: req.params.id } });
         await newNotification.save();
 
@@ -196,14 +200,37 @@ router.get("/notifications/:id", async (req, res) => {
       const notifications = await Notifications.find({
         toUserId: req.params.id,
       });
-      notifications.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      notifications.sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      );
 
       res.status(200).json(notifications);
     } else {
       res.status(403).json({ message: "You can only view your notifications" });
     }
   } catch (err) {
-    console.log(err);
+    res.status(500).json(err);
+  }
+});
+
+// read all notifications
+router.put("/readNotifications", async (req, res) => {
+  try {
+    const token = req.header("Authorization").substring(7);
+    const payload = jwt.decode(token);
+
+    if(payload.id===req.body.userId){
+      const user= await User.findByIdAndUpdate(req.body.userId,{
+        $set : {hasUnreadNotifications: false}
+      });
+
+      res.status(200).json('message','Read all notifications');
+
+    }else{
+      res.status(403).json({'message':'Operation not allowed'});
+    }
+
+  } catch (err) {
     res.status(500).json(err);
   }
 });
