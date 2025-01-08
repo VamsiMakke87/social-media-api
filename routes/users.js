@@ -141,7 +141,7 @@ router.put("/follow/:id", async (req, res) => {
       const notificationData = {
         fromUserId: req.body.userId,
         toUserId: req.params.id,
-        description: "followed you",
+        type: 0,
       };
       const newNotification = new Notifications(notificationData);
       const user = await User.findById(req.params.id);
@@ -204,7 +204,17 @@ router.get("/notifications/:id", async (req, res) => {
         (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
       );
 
-      res.status(200).json(notifications);
+      const updatedNotifications = await Promise.all(
+        notifications.map(async (notification) => {
+          const notif = notification.toObject();
+          const user = await User.findById(notif.fromUserId);
+          notif.username = user.username;
+          notif.profilePic = user.profilePic;
+          return notif;
+        })
+      );
+
+      res.status(200).json(updatedNotifications);
     } else {
       res.status(403).json({ message: "You can only view your notifications" });
     }
@@ -219,17 +229,15 @@ router.put("/readNotifications", async (req, res) => {
     const token = req.header("Authorization").substring(7);
     const payload = jwt.decode(token);
 
-    if(payload.id===req.body.userId){
-      const user= await User.findByIdAndUpdate(req.body.userId,{
-        $set : {hasUnreadNotifications: false}
+    if (payload.id === req.body.userId) {
+      const user = await User.findByIdAndUpdate(req.body.userId, {
+        $set: { hasUnreadNotifications: false },
       });
 
-      res.status(200).json('message','Read all notifications');
-
-    }else{
-      res.status(403).json({'message':'Operation not allowed'});
+      res.status(200).json("message", "Read all notifications");
+    } else {
+      res.status(403).json({ message: "Operation not allowed" });
     }
-
   } catch (err) {
     res.status(500).json(err);
   }

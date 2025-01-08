@@ -24,9 +24,15 @@ const notificationsSchema = mongoose.Schema(
       type: String,
       max: 50,
     },
-    description: {
-      type: String,
-      max: 50,
+    type: {
+      type: Number,
+      enum: [0, 1, 2, 3],
+      /*
+      0 - follow notificaiton
+      1 - like notification
+      2 - comment notificaiton
+      3 - reply notification
+      */
     },
   },
   { timestamps: true }
