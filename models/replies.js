@@ -5,15 +5,23 @@ const replySchema = mongoose.Schema(
     userId: {
       type: String,
       max: 50,
-      required: true
+      required: true,
     },
     description: {
       type: String,
       max: 100,
     },
-    commentId:{
-        type: String,
-        max: 50
+    postId: {
+      type: String,
+      max: 50,
+    },
+    commentId: {
+      type: String,
+      max: 50,
+    },
+    commentUserId: {
+      type: String,
+      max: 50,
     },
     likes: {
       type: Array,

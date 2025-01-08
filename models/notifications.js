@@ -26,14 +26,19 @@ const notificationsSchema = mongoose.Schema(
     },
     type: {
       type: Number,
-      enum: [0, 1, 2, 3],
+      enum: [0, 1, 2, 3, 4, 5],
       /*
       0 - follow notificaiton
       1 - like notification
       2 - comment notificaiton
-      3 - reply notification
+      3 - like comment
+      4 - reply notification
+      5 - like reply
       */
     },
+    description:{
+      type: String
+    }
   },
   { timestamps: true }
 );
