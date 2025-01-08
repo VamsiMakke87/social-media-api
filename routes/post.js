@@ -1,6 +1,7 @@
 const router = require("express").Router();
 const Post = require("../models/post");
 const User = require("../models/user");
+const Notification = require("../models/notifications");
 const path = require("path");
 const multer = require("multer");
 
@@ -55,7 +56,7 @@ router.post("/", upload.single("file"), async (req, res) => {
 router.get("/:id", async (req, res) => {
   try {
     const postById = await Post.findById(req.params.id);
-    const post= postById.toObject();
+    const post = postById.toObject();
     const user = await User.findById(post.userId);
     post.username = user.username;
     post.profilePic = user.profilePic;
@@ -105,6 +106,19 @@ router.put("/like/:id", async (req, res) => {
 
     if (!post.likes.includes(req.body.userId)) {
       await post.updateOne({ $push: { likes: req.body.userId } });
+      if (req.body.userId != post.userId) {
+        const notificationData = {
+          fromUserId: req.body.userId,
+          toUserId: post.userId,
+          postId: post._id,
+          type: 1,
+        };
+        const newNotification = new Notification(notificationData);
+        await newNotification.save();
+        await User.findByIdAndUpdate(post.userId, {
+          $set: { hasUnreadNotifications: true },
+        });
+      }
       res.status(200).json("Liked Sucessfully");
     } else {
       await post.updateOne({ $pull: { likes: req.body.userId } });
