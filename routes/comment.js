@@ -19,6 +19,7 @@ router.post("/", async (req, res) => {
         fromUserId: req.body.userId,
         toUserId: post.userId,
         postId: post._id,
+        commentId: data._id,
         description: newComment.description,
         type: 2,
       };
@@ -85,12 +86,13 @@ router.put("/like/:id", async (req, res) => {
           fromUserId: req.body.userId,
           toUserId: comment.userId,
           postId: comment.postId,
+          commentId: comment._id,
           description: comment.description,
           type: 3,
         };
         const newNotification = new Notification(notificationData);
         await newNotification.save();
-        await User.findByIdAndUpdate(comment.postUserId, {
+        await User.findByIdAndUpdate(comment.userId, {
           $set: { hasUnreadNotifications: true },
         });
       }

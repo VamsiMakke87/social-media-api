@@ -29,11 +29,11 @@ const notificationsSchema = mongoose.Schema(
       enum: [0, 1, 2, 3, 4, 5],
       /*
       0 - follow notificaiton
-      1 - like notification
-      2 - comment notificaiton
-      3 - like comment
+      1 - post like notification
+      2 - post comment notificaiton
+      3 - like comment notification
       4 - reply notification
-      5 - like reply
+      5 - like reply notification
       */
     },
     description:{
