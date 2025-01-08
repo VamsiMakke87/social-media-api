@@ -48,6 +48,7 @@ A RESTful API for a social media platform that allows users to create posts, com
 - **PUT /api/users/follow/:id** - Follow a user
 - **PUT /api/users/unfollow/:id** - Unfollow a user
 - **GET /api/users/notifications/:id** - Get notifications of a user
+- **PUT /api/users/readNotifications** - Read all notifications of a user
 - **PUT api/users/profilepic** - Update profile picture
 - **POST /api/posts** - Create a new post
 - **GET /api/posts/:id** - Get an existing post
