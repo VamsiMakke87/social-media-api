@@ -39,6 +39,57 @@ router.get("/", (req, res) => {
   res.send("User Route");
 });
 
+//get user notifications
+router.get("/notifications/:id", async (req, res) => {
+  try {
+    const token = req.header("Authorization").substring(7);
+    const payload = jwt.decode(token);
+
+    if (payload.id === req.params.id) {
+      const notifications = await Notifications.find({
+        toUserId: req.params.id,
+      });
+      notifications.sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      );
+
+      const updatedNotifications = await Promise.all(
+        notifications.map(async (notification) => {
+          const notif = notification.toObject();
+          const user = await User.findById(notif.fromUserId);
+          notif.username = user.username;
+          notif.profilePic = user.profilePic;
+          return notif;
+        })
+      );
+
+      res.status(200).json(updatedNotifications);
+    } else {
+      res.status(403).json({ message: "You can only view your notifications" });
+    }
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
+// read all notifications
+router.put("/readNotifications", async (req, res) => {
+  try {
+    const token = req.header("Authorization").substring(7);
+    const payload = jwt.decode(token);
+    const userId = payload.id;
+
+    const user = await User.findByIdAndUpdate(userId, {
+      $set: { hasUnreadNotifications: false },
+    });
+
+    res.status(200).json({ message: "Read all notifications" });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json(err);
+  }
+});
+
 //update profile pic
 router.put("/profilepic", upload.single("file"), async (req, res) => {
   try {
@@ -186,59 +237,6 @@ router.put("/unfollow/:id", async (req, res) => {
     }
   } catch (err) {
     // console.log(err);
-    res.status(500).json(err);
-  }
-});
-
-//get user notifications
-router.get("/notifications/:id", async (req, res) => {
-  try {
-    const token = req.header("Authorization").substring(7);
-    const payload = jwt.decode(token);
-
-    if (payload.id === req.params.id) {
-      const notifications = await Notifications.find({
-        toUserId: req.params.id,
-      });
-      notifications.sort(
-        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-      );
-
-      const updatedNotifications = await Promise.all(
-        notifications.map(async (notification) => {
-          const notif = notification.toObject();
-          const user = await User.findById(notif.fromUserId);
-          notif.username = user.username;
-          notif.profilePic = user.profilePic;
-          return notif;
-        })
-      );
-
-      res.status(200).json(updatedNotifications);
-    } else {
-      res.status(403).json({ message: "You can only view your notifications" });
-    }
-  } catch (err) {
-    res.status(500).json(err);
-  }
-});
-
-// read all notifications
-router.put("/readNotifications", async (req, res) => {
-  try {
-    const token = req.header("Authorization").substring(7);
-    const payload = jwt.decode(token);
-
-    if (payload.id === req.body.userId) {
-      const user = await User.findByIdAndUpdate(req.body.userId, {
-        $set: { hasUnreadNotifications: false },
-      });
-
-      res.status(200).json("message", "Read all notifications");
-    } else {
-      res.status(403).json({ message: "Operation not allowed" });
-    }
-  } catch (err) {
     res.status(500).json(err);
   }
 });
