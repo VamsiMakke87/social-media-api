@@ -79,8 +79,6 @@ io.on("connection", (socket) => {
 Notification.watch().on("change", (change) => {
   const notificationData = change.fullDocument;
   const client = clients.get(notificationData.toUserId);
-  console.log(notificationData);
-  console.log(client, "sent", notificationData.toUserId);
   if (client) {
     client.emit("new_notification", {
       type: "new_notification",

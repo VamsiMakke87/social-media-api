@@ -150,7 +150,6 @@ router.delete("/:id", async (req, res) => {
 
 // Search for users by username similarity
 router.get("/search", async (req, res) => {
-  console.log("here");
   const { username } = req.query;
   if (!username) {
     return res.status(400).json("Username query parameter is required");
