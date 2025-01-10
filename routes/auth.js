@@ -8,7 +8,7 @@ router.get("/", (req, res) => {
   res.send("Auth Route");
 });
 
-router.post("/register", async (req, res) => {
+router.post("/signup", async (req, res) => {
   try {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(req.body.password, salt);
@@ -51,5 +51,22 @@ router.post("/login", async (req, res) => {
 });
 
 
+//if username or email already exists
+router.get("/exists", async (req, res) => {
+  try {
+    const username = req.query.username;
+    const email = req.query.email;
+
+    const query = {};
+    if (username) query.username = username;
+    if (email) query.email = email;
+
+    const user = await User.findOne(query);
+
+    res.status(200).json({isExists: user!==null});
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
 
 module.exports = router;

@@ -90,24 +90,6 @@ router.put("/readNotifications", async (req, res) => {
   }
 });
 
-//if username or email already exists
-router.get("/exists", async (req, res) => {
-  try {
-    const username = req.query.username;
-    const email = req.query.email;
-
-    const query = {};
-    if (username) query.username = username;
-    if (email) query.email = email;
-
-    const user = await User.findOne(query);
-
-    res.status(200).json({isExists: user!==null});
-  } catch (err) {
-    res.status(500).json(err);
-  }
-});
-
 //update profile pic
 router.put("/profilepic", upload.single("file"), async (req, res) => {
   try {
@@ -168,12 +150,11 @@ router.delete("/:id", async (req, res) => {
 
 // Search for users by username similarity
 router.get("/search", async (req, res) => {
-  const { username } = req.query;
-  if (!username) {
-    return res.status(400).json("Username query parameter is required");
-  }
-
   try {
+    const { username } = req.query;
+    if (!username) {
+      return res.status(400).json("Username query parameter is required");
+    }
     const users = await User.find({
       username: { $regex: username, $options: "i" },
     }).limit(10);
