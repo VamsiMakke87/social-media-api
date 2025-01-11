@@ -3,11 +3,13 @@ const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const morgan = require("morgan");
 const helmet = require("helmet");
+const nodemailer= require("nodemailer");
 const userRoute = require("./routes/users");
 const authRoute = require("./routes/auth");
 const postRoute = require("./routes/post");
 const commentRoute = require("./routes/comment");
 const replyRoute = require("./routes/replies");
+const mailRouter = require("./routes/mail");
 const Notification = require("./models/notifications");
 const cors = require("cors");
 const { Server } = require("socket.io");
@@ -53,6 +55,7 @@ app.use("/api/users", authenticateJWT, userRoute);
 app.use("/api/posts", authenticateJWT, postRoute);
 app.use("/api/comment", authenticateJWT, commentRoute);
 app.use("/api/comment/reply", authenticateJWT, replyRoute);
+app.use("/api/mail", mailRouter);
 
 const clients = new Map();
 
@@ -76,6 +79,8 @@ io.on("connection", (socket) => {
   }
 });
 
+
+
 Notification.watch().on("change", (change) => {
   const notificationData = change.fullDocument;
   const client = clients.get(notificationData.toUserId);
@@ -88,6 +93,9 @@ Notification.watch().on("change", (change) => {
   }
 });
 
+app.post("/api/");
+
 server.listen(8800, () => {
   console.log("Server started");
 });
+
