@@ -7,6 +7,7 @@ router.get("/", (req, res) => {
   res.send("Auth Route");
 });
 
+// signup API
 router.post("/signup", async (req, res) => {
   try {
     const salt = await bcrypt.genSalt(10);
@@ -23,6 +24,7 @@ router.post("/signup", async (req, res) => {
   }
 });
 
+// Login API
 router.post("/login", async (req, res) => {
   try {
     const user = await User.findOne({ email: req.body.email });
@@ -53,6 +55,7 @@ router.post("/login", async (req, res) => {
   }
 });
 
+// Account activation API
 router.put("/activate", async (req, res) => {
   try {
     const { token } = req.body;
@@ -60,12 +63,10 @@ router.put("/activate", async (req, res) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const currentTime = Math.floor(Date.now() / 1000);
     if (decoded.exp < currentTime) {
-      return res
-        .status(400)
-        .json({
-          message:
-            "Activation link expired, Please request a new activation link",
-        });
+      return res.status(400).json({
+        message:
+          "Activation link expired, Please request a new activation link",
+      });
     }
     const user = await User.findById(decoded.id);
     console.log(user.id);
@@ -105,4 +106,23 @@ router.get("/exists", async (req, res) => {
   }
 });
 
+// Forgot Password API
+router.put("/forgotPassword", async (req, res) => {
+  try {
+    const { token, password } = req.body;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword =await  bcrypt.hash(password, salt);
+    user.password = hashedPassword;
+    await user.save();
+
+    res.status(200).json({ message: "Password updated successfully" });
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
 module.exports = router;

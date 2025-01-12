@@ -40,6 +40,11 @@ router.get("/sendActivationLink", async (req, res) => {
     const { email } = req.query;
 
     const user = await User.findOne({ email: email });
+    if (!user) return res.status(404).json({ message: "User not found" });
+    if (user.isActivated)
+      return res
+        .status(403)
+        .json({ message: "Account already activated, Please login" });
 
     const token = jwt.sign(
       { id: user._id, email: user.email },
@@ -68,9 +73,62 @@ const sendActivationMail = async (email, username, token) => {
       <body>
         <div>Hi ${username},</div>
         <div>Click this <a href="${process.env.FRONTEND_URL}/activate/${token}">link</a> to activate your account</div>
-      </body>
+        <div>This link is only valid for 1 hour</div>
+        </body>
       </html>
       `,
+    };
+
+    const res = await mailTransporter.sendMail(mailOptions);
+
+    return res;
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+router.get("/sendForgotPasswordLink", async (req, res) => {
+  try {
+    const { email } = req.query;
+
+    const user = await User.findOne({ email: email });
+    if (!user) return res.status(404).json({ message: "User not found" });
+    if (!user.isActivated) {
+      return res.status(400).json({
+        message: "Account not activated. Please activate your account",
+      });
+    }
+    const token = jwt.sign(
+      { id: user._id, email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+
+    const data = await sendForgotPasswordMail(user.email, user.username, token);
+
+    return res.status(200).json(data);
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+const sendForgotPasswordMail = async (email, username, token) => {
+  try {
+    initMail();
+
+    const mailOptions = {
+      from: `"Social Media App" ${process.env.MAIL_ID}`,
+      to: email,
+      subject: "Reset Password Request",
+      html: `
+        <html>
+        <body>
+          <div>Hi ${username},</div>
+          <div>Click this <a href="${process.env.FRONTEND_URL}/forgotpassword/${token}">link</a> to reset your password</div>
+          <div>This link is only valid for 1 hour</div>
+        </body>
+        </html>
+        `,
     };
 
     const res = await mailTransporter.sendMail(mailOptions);
