@@ -27,7 +27,7 @@ const userSchema = mongoose.Schema(
     },
     hasUnreadNotifications: {
       type: Boolean,
-      default: false
+      default: false,
     },
     followers: {
       type: Array,
@@ -38,6 +38,10 @@ const userSchema = mongoose.Schema(
       default: [],
     },
     isActivated: {
+      type: Boolean,
+      default: false,
+    },
+    isTfaOn: {
       type: Boolean,
       default: false,
     },

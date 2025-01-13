@@ -108,6 +108,22 @@ router.put("/profilepic", upload.single("file"), async (req, res) => {
   }
 });
 
+//toggle Two factor authentication
+router.put("/toggleTFA", async (req, res) => {
+  try {
+    const { tfa, userId } = req.body;
+    console.log(userId);
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+    user.isTfaOn = tfa;
+    await user.save();
+    return res.status(200).json({ message: "Operation Successfull" });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json(err);
+  }
+});
+
 // Update User profile
 router.put("/:id", async (req, res) => {
   if (req.body.userId === req.params.id || req.body.isAdmin) {
