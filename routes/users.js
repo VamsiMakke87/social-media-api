@@ -173,6 +173,7 @@ router.get("/search", async (req, res) => {
     }
     const users = await User.find({
       username: { $regex: username, $options: "i" },
+      isActivated: true
     }).limit(10);
 
     if (users.length > 0) {
