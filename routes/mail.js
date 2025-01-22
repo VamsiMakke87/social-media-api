@@ -139,7 +139,7 @@ const sendForgotPasswordMail = async (email, username, token) => {
   }
 };
 
-router.post("/sendOTP", async (req, res) => {
+router.post("/sendLoginOTP", async (req, res) => {
   try {
     const { email, otp } = req.body;
     const user = await User.findOne({ email: email });
