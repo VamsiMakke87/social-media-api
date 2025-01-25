@@ -145,7 +145,7 @@ router.post("/sendLoginOTP", async (req, res) => {
     const user = await User.findOne({ email: email });
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    const data = await sendOTPMail(user.email, user.username, otp);
+    const data = await sendLoginOTPMail(user.email, user.username, otp);
 
     return res.status(200).json(data);
   } catch (err) {
@@ -153,19 +153,60 @@ router.post("/sendLoginOTP", async (req, res) => {
   }
 });
 
-const sendOTPMail = async (email, username, otp) => {
+const sendLoginOTPMail = async (email, username, otp) => {
   try {
     initMail();
 
     const mailOptions = {
       from: `"Social Media App" ${process.env.MAIL_ID}`,
       to: email,
-      subject: "OTP Request",
+      subject: "Login OTP Request",
       html: `
         <html>
         <body>
           <div>Hi ${username},</div>
           <div>Enter this one-time password to login to your account.</div>
+          <h1>${otp}</h1>
+        </body>
+        </html>
+        `,
+    };
+
+    const res = await mailTransporter.sendMail(mailOptions);
+
+    return res;
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+router.post("/sendChangeEmailOTP", async (req, res) => {
+  try {
+    const { email, otp, username } = req.body;
+    // const user = await User.findOne({ email: email });
+    // if (!user) return res.status(404).json({ message: "User not found" });
+
+    const data = await sendChangeEmailOTP(email, username, otp);
+
+    return res.status(200).json(data);
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+const sendChangeEmailOTP = async (email, username, otp) => {
+  try {
+    initMail();
+
+    const mailOptions = {
+      from: `"Social Media App" ${process.env.MAIL_ID}`,
+      to: email,
+      subject: "Change Mail OTP Request",
+      html: `
+        <html>
+        <body>
+          <div>Hi ${username},</div>
+          <div>Enter this one-time password to update your email.</div>
           <h1>${otp}</h1>
         </body>
         </html>
