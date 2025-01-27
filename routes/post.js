@@ -1,10 +1,25 @@
 const router = require("express").Router();
+require("dotenv").config();
 const Post = require("../models/post");
 const User = require("../models/user");
 const Notification = require("../models/notifications");
 const path = require("path");
 const multer = require("multer");
+const crypto= require('crypto');
+const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 
+
+const randomImageName=  (bytes=32)=>{
+  return crypto.randomBytes(bytes).toString('hex');
+}
+
+const s3 = new S3Client({
+  region: process.env.BUCKET_REGION,
+  credentials: {
+    accessKeyId: process.env.ACCESS_KEY,
+    secretAccessKey: process.env.SECRET_KEY,
+  },
+});
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, `${process.env.FILE_UPLOAD}/posts`);
@@ -32,6 +47,10 @@ const upload = multer({
   },
 });
 
+const storage2 = multer.memoryStorage();
+
+const upload2 = multer({ storage: storage2 });
+
 // Create a post
 router.post("/", upload.single("file"), async (req, res) => {
   const { userId, description } = req.body;
@@ -40,7 +59,6 @@ router.post("/", upload.single("file"), async (req, res) => {
     const imagePath = path.join("./images/posts", req.file.filename);
     data.image = "/" + imagePath;
   }
-  console.log(req.body);
   const newPost = new Post(data);
 
   try {
@@ -49,6 +67,29 @@ router.post("/", upload.single("file"), async (req, res) => {
   } catch (err) {
     console.log(err);
     res.status(500).json(err);
+  }
+});
+
+//upload file to S3
+router.post("/uploadS3", upload2.single("image"), async (req, res) => {
+  try {
+
+
+    const params = {
+      Bucket: process.env.BUCKET_NAME,
+      Key: randomImageName(),
+      Body: req.file.buffer,
+      ContentType: req.file.mimetype,
+    };
+
+    const command = new PutObjectCommand(params);
+
+    const data = await s3.send(command);
+
+    res.status(200).json(data);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json(`${err}`);
   }
 });
 
